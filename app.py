@@ -42,7 +42,8 @@ GLOBAL_REGION_CODES = {
 }
 
 HT_TYPE_CODES = {
-    "Conventional": "CV"
+    "Conventional": "CV",
+    "H Tolerance": "HT"
 }
 
 MATERIAL_TYPE_CODES = {
@@ -68,12 +69,14 @@ RD_PHASE_CODES = {
 # AI NORMALIZATION MAPS
 # ============================================================
 
+# These mappings are deliberately explicit so that the AI
+# does not invent naming codes.
+
 REGION_PAZ_MAP = {
 
     # -----------------------------
     # INDIA
     # -----------------------------
-
     "India Central": ("India", "CN"),
     "India North East": ("India", "NE"),
     "India North West": ("India", "NW"),
@@ -82,14 +85,12 @@ REGION_PAZ_MAP = {
     # -----------------------------
     # US
     # -----------------------------
-
     "US Southeast": ("US", "SE"),
     "US Multi-zone": ("US", "MZ"),
 
     # -----------------------------
     # MERCOSUR
     # -----------------------------
-
     "Southern Brazil & Uruguay": ("Mercosur", "SB"),
     "Mercosur Multi-zone": ("Mercosur", "MZ"),
 }
@@ -137,7 +138,6 @@ if book_type == "📍 Field Book Names":
         "directly from the file."
     )
 
-
     # --------------------------------------------------------
     # FILE UPLOAD
     # --------------------------------------------------------
@@ -147,21 +147,16 @@ if book_type == "📍 Field Book Names":
         type=["csv"]
     )
 
-
     if uploaded_file is not None:
 
         try:
-
             df = pd.read_csv(uploaded_file)
 
         except Exception as e:
-
             st.error(
                 f"Could not read the CSV file: {e}"
             )
-
             st.stop()
-
 
         # ----------------------------------------------------
         # REQUIRED COLUMNS
@@ -190,7 +185,6 @@ if book_type == "📍 Field Book Names":
             )
 
             st.stop()
-
 
         # ----------------------------------------------------
         # CLEAN DATA
@@ -227,7 +221,6 @@ if book_type == "📍 Field Book Names":
             (df["Stage"] != "")
         ]
 
-
         # ----------------------------------------------------
         # SUCCESS
         # ----------------------------------------------------
@@ -236,7 +229,6 @@ if book_type == "📍 Field Book Names":
             f"✓ Successfully loaded {len(df)} "
             f"location/stage records."
         )
-
 
         # ----------------------------------------------------
         # VIEW INPUT
@@ -254,7 +246,6 @@ if book_type == "📍 Field Book Names":
 
         st.divider()
 
-
         # ====================================================
         # TRIAL INFORMATION
         # ====================================================
@@ -262,7 +253,6 @@ if book_type == "📍 Field Book Names":
         st.subheader("Trial Information")
 
         col1, col2, col3 = st.columns(3)
-
 
         with col1:
 
@@ -274,7 +264,6 @@ if book_type == "📍 Field Book Names":
                 step=1
             )
 
-
         with col2:
 
             season = st.selectbox(
@@ -282,14 +271,12 @@ if book_type == "📍 Field Book Names":
                 list(SEASON_CODES.keys())
             )
 
-
         with col3:
 
             program = st.selectbox(
                 "Program",
                 list(PROGRAM_CODES.keys())
             )
-
 
         # ----------------------------------------------------
         # PAZ
@@ -313,7 +300,6 @@ if book_type == "📍 Field Book Names":
             paz_options
         )
 
-
         # ----------------------------------------------------
         # FILTER LOCATIONS
         # ----------------------------------------------------
@@ -328,13 +314,11 @@ if book_type == "📍 Field Book Names":
                 df["PAZ"] == selected_paz
             ].copy()
 
-
         st.info(
             f"📍 {len(paz_df)} locations found for "
             f"{selected_paz}. "
             "All stages in the uploaded file will be used."
         )
-
 
         # ----------------------------------------------------
         # SHOW WHAT WILL BE GENERATED
@@ -352,7 +336,6 @@ if book_type == "📍 Field Book Names":
 
         st.divider()
 
-
         # ====================================================
         # GENERATE FIELD BOOKS
         # ====================================================
@@ -365,16 +348,17 @@ if book_type == "📍 Field Book Names":
 
             output_rows = []
 
-
             for _, row in paz_df.iterrows():
 
                 paz = row["PAZ"]
                 location = row["Location"]
                 stage = row["Stage"]
 
-
                 # --------------------------------------------
                 # FIELD BOOK NAME
+                #
+                # Example:
+                # 26Y1_AMBIKAPUR1_ME_S12_INCN
                 # --------------------------------------------
 
                 book_name = (
@@ -386,7 +370,6 @@ if book_type == "📍 Field Book Names":
                     f"_{paz}"
                 )
 
-
                 output_rows.append({
                     "PAZ": paz,
                     "Location": location,
@@ -395,11 +378,9 @@ if book_type == "📍 Field Book Names":
                     "Field Book Name": book_name
                 })
 
-
             output_df = pd.DataFrame(
                 output_rows
             )
-
 
             st.success(
                 f"✓ Generated {len(output_df)} Field Book Names."
@@ -414,7 +395,6 @@ if book_type == "📍 Field Book Names":
                 width="stretch",
                 hide_index=True
             )
-
 
             # ------------------------------------------------
             # DOWNLOAD
@@ -448,7 +428,6 @@ else:
         "or by describing what you need in natural language."
     )
 
-
     # ========================================================
     # MANUAL / AI TABS
     # ========================================================
@@ -475,13 +454,11 @@ else:
             "data governance."
         )
 
-
         # ----------------------------------------------------
         # BASIC INFORMATION
         # ----------------------------------------------------
 
         col1, col2, col3 = st.columns(3)
-
 
         with col1:
 
@@ -494,7 +471,6 @@ else:
                 key="manual_year"
             )
 
-
         with col2:
 
             manual_book_type = st.selectbox(
@@ -502,7 +478,6 @@ else:
                 list(BOOK_TYPE_CODES.keys()),
                 key="manual_book_type"
             )
-
 
         with col3:
 
@@ -512,7 +487,6 @@ else:
                 key="manual_season"
             )
 
-
         # ----------------------------------------------------
         # REGION / PAZ
         # ----------------------------------------------------
@@ -521,7 +495,6 @@ else:
 
         col1, col2 = st.columns(2)
 
-
         with col1:
 
             manual_region = st.selectbox(
@@ -529,7 +502,6 @@ else:
                 list(GLOBAL_REGION_CODES.keys()),
                 key="manual_region"
             )
-
 
         with col2:
 
@@ -556,13 +528,11 @@ else:
                     "MZ"
                 ]
 
-
             manual_paz = st.selectbox(
                 "PAZ",
                 manual_paz_options,
                 key="manual_paz"
             )
-
 
         # ----------------------------------------------------
         # PRODUCT CONCEPT / HT / MATERIAL
@@ -572,7 +542,6 @@ else:
 
         col1, col2, col3 = st.columns(3)
 
-
         with col1:
 
             manual_product = st.selectbox(
@@ -580,7 +549,6 @@ else:
                 list(PROGRAM_CODES.keys()),
                 key="manual_product"
             )
-
 
         with col2:
 
@@ -590,7 +558,6 @@ else:
                 key="manual_ht"
             )
 
-
         with col3:
 
             manual_material = st.selectbox(
@@ -598,7 +565,6 @@ else:
                 list(MATERIAL_TYPE_CODES.keys()),
                 key="manual_material"
             )
-
 
         # ----------------------------------------------------
         # R&D PHASE
@@ -610,7 +576,6 @@ else:
             key="manual_phase"
         )
 
-
         # ----------------------------------------------------
         # NUMBER OF BOOKS
         # ----------------------------------------------------
@@ -618,12 +583,11 @@ else:
         manual_number = st.number_input(
             "Number of Books",
             min_value=1,
-            max_value=99,
+            max_value=999,
             value=20,
             step=1,
             key="manual_number"
         )
-
 
         # ----------------------------------------------------
         # STARTING BOOK NUMBER
@@ -638,7 +602,6 @@ else:
             key="manual_start"
         )
 
-
         # ----------------------------------------------------
         # GENERATE
         # ----------------------------------------------------
@@ -652,7 +615,6 @@ else:
 
             output_rows = []
 
-
             for i in range(
                 manual_number
             ):
@@ -660,7 +622,6 @@ else:
                 book_number = (
                     manual_start + i
                 )
-
 
                 if book_number > 99:
 
@@ -671,7 +632,6 @@ else:
                     )
 
                     break
-
 
                 book_name = (
                     f"{str(manual_year)[-2:]}"
@@ -689,48 +649,23 @@ else:
                     f"{book_number:02d}"
                 )
 
-
                 output_rows.append({
-
-                    "Book Number":
-                        f"{book_number:02d}",
-
-                    "Year":
-                        manual_year,
-
-                    "Book Type":
-                        manual_book_type,
-
-                    "Season":
-                        manual_season,
-
-                    "Global Region":
-                        manual_region,
-
-                    "PAZ":
-                        manual_paz,
-
-                    "Product Concept":
-                        manual_product,
-
-                    "HT Type":
-                        manual_ht,
-
-                    "Material Type":
-                        manual_material,
-
-                    "R&D Phase":
-                        manual_phase,
-
-                    "Entry Book Name":
-                        book_name
+                    "Book Number": f"{book_number:02d}",
+                    "Year": manual_year,
+                    "Book Type": manual_book_type,
+                    "Season": manual_season,
+                    "Global Region": manual_region,
+                    "PAZ": manual_paz,
+                    "Product Concept": manual_product,
+                    "HT Type": manual_ht,
+                    "Material Type": manual_material,
+                    "R&D Phase": manual_phase,
+                    "Entry Book Name": book_name
                 })
-
 
             output_df = pd.DataFrame(
                 output_rows
             )
-
 
             if not output_df.empty:
 
@@ -749,13 +684,11 @@ else:
                     hide_index=True
                 )
 
-
                 csv = (
                     output_df
                     .to_csv(index=False)
                     .encode("utf-8")
                 )
-
 
                 st.download_button(
                     label="⬇️ Download Entry Book Names CSV",
@@ -783,13 +716,11 @@ else:
             "naming rules will generate the official names."
         )
 
-
         st.caption(
             "Example: Generate 20 Yield Entry Books for 2026 "
             "main season, India Central, Mid-Early, "
             "Conventional Hybrid, H0."
         )
-
 
         description = st.text_area(
             "Describe what you need",
@@ -821,7 +752,6 @@ else:
                     "GROQ_API_KEY is not configured. "
                     "Add it under Streamlit Secrets."
                 )
-
 
             system_prompt = """
 You are the natural-language interpreter for a
@@ -911,13 +841,9 @@ Long Grain = LG
 HT TYPE
 ============================================================
 
-Only the following HT type is supported:
-
 Conventional = CV
-Conventional Hybrid = CV
-
-Use only supported values.
-Do not invent alternative HT types or codes.
+H Tolerance = HT
+HT = HT
 
 ============================================================
 MATERIAL TYPE
@@ -929,9 +855,6 @@ Parent Line = PY
 B-line = BL
 R-line = RL
 Specialty = ZZ
-
-Use only supported values.
-Do not invent alternative material types or codes.
 
 ============================================================
 R&D PHASE
@@ -965,7 +888,6 @@ IMPORTANT INTERPRETATION
 Example:
 
 "India Central"
-
 must become:
 
 global_region = "India"
@@ -975,31 +897,31 @@ NOT:
 
 global_region = "India Central"
 
-
 Example:
 
 "India Multi-zone"
-
 must become:
 
 global_region = "India"
 paz = "MZ"
 
-
 Example:
 
 "Conventional Hybrid"
-
 must become:
 
 ht_type = "CV"
 material_type = "HY"
 
+"H Tolerance Hybrid"
+must become:
+
+ht_type = "HT"
+material_type = "HY"
 
 Example:
 
 "H0"
-
 must become:
 
 rd_phase = 3
@@ -1027,54 +949,37 @@ Return JSON only.
 
             response = requests.post(
                 "https://api.groq.com/openai/v1/chat/completions",
-
                 headers={
                     "Authorization":
                         f"Bearer {api_key}",
-
                     "Content-Type":
                         "application/json"
                 },
-
                 json={
-
-                    "model":
-                        "openai/gpt-oss-20b",
+                    "model": "openai/gpt-oss-20b",
 
                     "messages": [
-
                         {
-                            "role":
-                                "system",
-
-                            "content":
-                                system_prompt
+                            "role": "system",
+                            "content": system_prompt
                         },
-
                         {
-                            "role":
-                                "user",
-
-                            "content":
-                                user_request
+                            "role": "user",
+                            "content": user_request
                         }
                     ],
 
-                    "temperature":
-                        0,
+                    "temperature": 0,
 
-                    "max_tokens":
-                        400,
+                    "max_tokens": 400,
 
                     "response_format": {
-                        "type":
-                            "json_object"
+                        "type": "json_object"
                     }
                 },
 
                 timeout=60
             )
-
 
             if response.status_code != 200:
 
@@ -1084,15 +989,12 @@ Return JSON only.
                     f"{response.text}"
                 )
 
-
             result = response.json()
-
 
             content = (
                 result["choices"][0]["message"]["content"]
                 .strip()
             )
-
 
             return json.loads(content)
 
@@ -1127,13 +1029,11 @@ Return JSON only.
                             description
                         )
 
-
                     # ----------------------------------------
                     # REQUIRED FIELDS
                     # ----------------------------------------
 
                     required_fields = [
-
                         "number_of_books",
                         "year",
                         "book_type",
@@ -1146,16 +1046,11 @@ Return JSON only.
                         "rd_phase"
                     ]
 
-
                     missing = [
-
                         field
-
                         for field in required_fields
-
                         if field not in ai_data
                     ]
-
 
                     if missing:
 
@@ -1163,7 +1058,6 @@ Return JSON only.
                             "AI response is missing: "
                             + ", ".join(missing)
                         )
-
 
                     # ----------------------------------------
                     # CONVERT VALUES
@@ -1209,7 +1103,6 @@ Return JSON only.
                         ai_data["rd_phase"]
                     )
 
-
                     # ----------------------------------------
                     # NORMALIZE BOOK TYPE
                     # ----------------------------------------
@@ -1228,7 +1121,6 @@ Return JSON only.
                             f"Invalid book type: "
                             f"{book_type_value}"
                         )
-
 
                     # ----------------------------------------
                     # NORMALIZE SEASON
@@ -1255,40 +1147,25 @@ Return JSON only.
                             f"{season_value}"
                         )
 
-
                     # ----------------------------------------
                     # NORMALIZE PRODUCT CONCEPT
                     # ----------------------------------------
 
                     product_lookup = {
+                        "me": "ME",
+                        "mid-early": "ME",
+                        "mid early": "ME",
 
-                        "me":
-                            "ME",
+                        "mm": "MM",
+                        "medium maturity": "MM",
 
-                        "mid-early":
-                            "ME",
-
-                        "mid early":
-                            "ME",
-
-                        "mm":
-                            "MM",
-
-                        "medium maturity":
-                            "MM",
-
-                        "lg":
-                            "LG",
-
-                        "long grain":
-                            "LG"
+                        "lg": "LG",
+                        "long grain": "LG"
                     }
-
 
                     product_key = (
                         product_value.lower()
                     )
-
 
                     if product_key in product_lookup:
 
@@ -1305,28 +1182,21 @@ Return JSON only.
                             f"{product_value}"
                         )
 
-
                     # ----------------------------------------
                     # NORMALIZE HT
                     # ----------------------------------------
 
                     ht_lookup = {
-
-                        "cv":
-                            "CV",
-
-                        "conventional":
-                            "CV",
-
-                        "conventional hybrid":
-                            "CV"
+                        "cv": "CV",
+                        "conventional": "CV",
+                        "ht": "HT",
+                        "h tolerance": "HT",
+                        "h-tolerance": "HT"
                     }
-
 
                     ht_key = (
                         ht_value.lower()
                     )
-
 
                     if ht_key in ht_lookup:
 
@@ -1341,64 +1211,36 @@ Return JSON only.
                             f"{ht_value}"
                         )
 
-
                     # ----------------------------------------
                     # NORMALIZE MATERIAL
                     # ----------------------------------------
 
                     material_lookup = {
+                        "hy": "HY",
+                        "hybrid": "HY",
 
-                        "hy":
-                            "HY",
+                        "vy": "VY",
+                        "varietal": "VY",
 
-                        "hybrid":
-                            "HY",
+                        "py": "PY",
+                        "parent": "PY",
+                        "parent line": "PY",
 
-                        "vy":
-                            "VY",
+                        "bl": "BL",
+                        "b-line": "BL",
+                        "b line": "BL",
 
-                        "varietal":
-                            "VY",
+                        "rl": "RL",
+                        "r-line": "RL",
+                        "r line": "RL",
 
-                        "py":
-                            "PY",
-
-                        "parent":
-                            "PY",
-
-                        "parent line":
-                            "PY",
-
-                        "bl":
-                            "BL",
-
-                        "b-line":
-                            "BL",
-
-                        "b line":
-                            "BL",
-
-                        "rl":
-                            "RL",
-
-                        "r-line":
-                            "RL",
-
-                        "r line":
-                            "RL",
-
-                        "zz":
-                            "ZZ",
-
-                        "specialty":
-                            "ZZ"
+                        "zz": "ZZ",
+                        "specialty": "ZZ"
                     }
-
 
                     material_key = (
                         material_value.lower()
                     )
-
 
                     if material_key in material_lookup:
 
@@ -1415,18 +1257,12 @@ Return JSON only.
                             f"{material_value}"
                         )
 
-
                     # ----------------------------------------
                     # NORMALIZE R&D PHASE
                     # ----------------------------------------
 
                     if rd_phase not in [
-                        1,
-                        2,
-                        3,
-                        4,
-                        5,
-                        9
+                        1, 2, 3, 4, 5, 9
                     ]:
 
                         raise Exception(
@@ -1434,28 +1270,19 @@ Return JSON only.
                             f"{rd_phase}"
                         )
 
-
                     # ----------------------------------------
                     # GLOBAL REGION
                     # ----------------------------------------
 
                     region_lookup = {
-
-                        "india":
-                            "IN",
-
-                        "us":
-                            "US",
-
-                        "mercosur":
-                            "MS"
+                        "india": "IN",
+                        "us": "US",
+                        "mercosur": "MS"
                     }
-
 
                     region_key = (
                         region_value.lower()
                     )
-
 
                     if region_key not in region_lookup:
 
@@ -1464,53 +1291,38 @@ Return JSON only.
                             f"{region_value}"
                         )
 
-
                     region_code = region_lookup[
                         region_key
                     ]
-
 
                     # ----------------------------------------
                     # VALID PAZ
                     # ----------------------------------------
 
                     valid_paz = {
-
                         "India": [
                             "CN",
                             "NE",
                             "NW",
                             "MZ"
                         ],
-
                         "US": [
                             "SE",
                             "MZ"
                         ],
-
                         "Mercosur": [
                             "SB",
                             "MZ"
                         ]
                     }
 
-
                     canonical_region = (
-
                         {
-                            "IN":
-                                "India",
-
-                            "US":
-                                "US",
-
-                            "MS":
-                                "Mercosur"
-                        }[
-                            region_code
-                        ]
+                            "IN": "India",
+                            "US": "US",
+                            "MS": "Mercosur"
+                        }[region_code]
                     )
-
 
                     if paz_value not in valid_paz[
                         canonical_region
@@ -1520,18 +1332,6 @@ Return JSON only.
                             f"Invalid PAZ '{paz_value}' "
                             f"for {canonical_region}."
                         )
-
-
-                    # ----------------------------------------
-                    # YEAR VALIDATION
-                    # ----------------------------------------
-
-                    if ai_year < 2000 or ai_year > 2099:
-
-                        raise Exception(
-                            "Year must be between 2000 and 2099."
-                        )
-
 
                     # ----------------------------------------
                     # NUMBER VALIDATION
@@ -1544,7 +1344,6 @@ Return JSON only.
                             "at least 1."
                         )
 
-
                     if number_of_books > 99:
 
                         raise Exception(
@@ -1552,7 +1351,6 @@ Return JSON only.
                             "allows a maximum of 99 books "
                             "per generated sequence."
                         )
-
 
                     # =================================================
                     # AI INTERPRETATION
@@ -1563,95 +1361,72 @@ Return JSON only.
                         "your request."
                     )
 
-
                     st.subheader(
                         "🤖 AI Interpretation"
                     )
 
-
                     interpretation_df = pd.DataFrame([
-
                         {
                             "Field":
                                 "Number of Books",
-
                             "Value":
                                 number_of_books
                         },
-
                         {
                             "Field":
                                 "Year",
-
                             "Value":
                                 ai_year
                         },
-
                         {
                             "Field":
                                 "Book Type",
-
                             "Value":
                                 book_type_value
                         },
-
                         {
                             "Field":
                                 "Season",
-
                             "Value":
                                 season_value
                         },
-
                         {
                             "Field":
                                 "Global Region",
-
                             "Value":
                                 canonical_region
                         },
-
                         {
                             "Field":
                                 "PAZ",
-
                             "Value":
                                 paz_value
                         },
-
                         {
                             "Field":
                                 "Product Concept",
-
                             "Value":
                                 product_code
                         },
-
                         {
                             "Field":
                                 "HT Type",
-
                             "Value":
                                 ht_code
                         },
-
                         {
                             "Field":
                                 "Material Type",
-
                             "Value":
                                 material_code
                         },
-
                         {
                             "Field":
                                 "R&D Phase",
-
                             "Value":
                                 rd_phase
                         }
                     ])
-
 
                     st.dataframe(
                         interpretation_df,
@@ -1659,13 +1434,11 @@ Return JSON only.
                         hide_index=True
                     )
 
-
                     # =================================================
                     # GENERATE ENTRY BOOK NAMES
                     # =================================================
 
                     output_rows = []
-
 
                     for i in range(
                         number_of_books
@@ -1673,39 +1446,23 @@ Return JSON only.
 
                         book_number = i + 1
 
-
                         book_name = (
-
                             f"{str(ai_year)[-2:]}"
-
                             f"{BOOK_TYPE_CODES[book_type_value]}"
-
                             f"{SEASON_CODES[season_value]}"
-
                             f"_"
-
                             f"{region_code}"
-
                             f"{paz_value}"
-
                             f"{product_code}"
-
                             f"_"
-
                             f"{ht_code}"
-
                             f"_"
-
                             f"{material_code}"
-
                             f"{rd_phase}"
-
                             f"{book_number:02d}"
                         )
 
-
                         output_rows.append({
-
                             "Book Number":
                                 f"{book_number:02d}",
 
@@ -1713,11 +1470,9 @@ Return JSON only.
                                 book_name
                         })
 
-
                     output_df = pd.DataFrame(
                         output_rows
                     )
-
 
                     st.success(
                         f"✓ Generated "
@@ -1725,18 +1480,15 @@ Return JSON only.
                         f"Entry Book Names."
                     )
 
-
                     st.subheader(
                         "Generated Entry Book Names"
                     )
-
 
                     st.dataframe(
                         output_df,
                         width="stretch",
                         hide_index=True
                     )
-
 
                     # --------------------------------------------
                     # DOWNLOAD
@@ -1748,26 +1500,19 @@ Return JSON only.
                         .encode("utf-8")
                     )
 
-
                     st.download_button(
                         label=(
                             "⬇️ Download AI-Generated "
                             "Entry Books CSV"
                         ),
-
                         data=csv,
-
                         file_name=(
                             "AI_Entry_books_output.csv"
                         ),
-
                         mime="text/csv",
-
                         width="stretch",
-
                         key="ai_download"
                     )
-
 
                     # --------------------------------------------
                     # SHOW AI JSON
@@ -1778,7 +1523,6 @@ Return JSON only.
                     ):
 
                         st.json(ai_data)
-
 
                 except Exception as e:
 
